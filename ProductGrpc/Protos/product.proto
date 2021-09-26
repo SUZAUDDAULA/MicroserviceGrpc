@@ -46,7 +46,7 @@ message InsertBultProductResponse{
 }
 
 message ProductModel{
-	int32 productId=1;
+	int32 Id=1;
 	string productCode=2;
 	string name=3;
 	string description=4;

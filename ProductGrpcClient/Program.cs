@@ -22,12 +22,78 @@ namespace ProductGrpcClient
 
             await GetProductAsync(client);
             await GetAllProductsAsync(client);
-            await AddProductAsync(client);
+            //await AddProductAsync(client);
+            //await UpdateProductAsync(client);
+            //await DeleteProductAsync(client);
+            //await InsertProductAsync(client);
            
             Console.ReadLine();
         }
 
-        
+        private static async Task InsertProductAsync(ProductProtoService.ProductProtoServiceClient client)
+        {
+            //InsertProductAsync
+            Console.WriteLine("InsertBulkProduct started...");
+            using var clientBulk = client.InsertBultProduct();
+
+            for (int i = 0; i < 3; i++)
+            {
+                var productModel = new ProductModel
+                {
+                    ProductCode = $"P1001-{i}",
+                    Name = $"{i}",
+                    Description = "Bulk Insert product",
+                    Price = 399,
+                    Status = ProductStatus.Instock,
+                    CreatedTime = Timestamp.FromDateTime(DateTime.UtcNow)
+                };
+
+                await clientBulk.RequestStream.WriteAsync(productModel);
+
+            }
+
+            await clientBulk.RequestStream.CompleteAsync();
+
+            var responseBulk = await clientBulk;
+            Console.WriteLine($"Status: { responseBulk.Success}. Insert Count: {responseBulk.InsertCount}");
+        }
+
+        private static async Task UpdateProductAsync(ProductProtoService.ProductProtoServiceClient client)
+        {
+            //UpdateProductAsync
+            Console.WriteLine("UpdateProductAsync started..");
+            var updateProductResponse = await client.UpdateProductAsync(
+                    new UpdateProductRequest
+                    {
+                        Product = new ProductModel
+                        {
+                            Id = 1,
+                            Name = "Red",
+                            Description = "New Red Phone Mi10T",
+                            Price = 699,
+                            Status = ProductStatus.Instock,
+                            CreatedTime = Timestamp.FromDateTime(DateTime.UtcNow)
+                        }
+                    }
+                );
+            Console.WriteLine("UpdateProductAsync Response: "+updateProductResponse.ToString());
+        }
+
+        private static async Task DeleteProductAsync(ProductProtoService.ProductProtoServiceClient client)
+        {
+            //DeleteProductAsync
+            Console.WriteLine("DeleteProductAsync started..");
+            var deleteProductResponse = await client.DeleteProductAsync(
+                    new DeleteProductRequest
+                    {
+                        ProductId=3
+                    }
+                );
+            Console.WriteLine("DeleteProductAsync Response: " + deleteProductResponse.Success.ToString());
+            Thread.Sleep(1000);
+        }
+
+
 
         //Get Product Async
         private static async Task GetProductAsync(ProductProtoService.ProductProtoServiceClient client)
