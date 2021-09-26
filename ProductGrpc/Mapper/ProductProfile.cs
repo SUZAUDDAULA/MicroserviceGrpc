@@ -14,12 +14,16 @@ namespace ProductGrpc.Mapper
         public ProductProfile()
         {
             CreateMap<Product, ProductModel>()
-                .ForMember(dest => dest.CreatedTime,
-                opt => opt.MapFrom(src => Timestamp.FromDateTime(Convert.ToDateTime(src.createdAt))));
+                .ForMember(dest => dest.CreatedTime,opt => opt.MapFrom(src => Timestamp.FromDateTime(Convert.ToDateTime(src.createdAt))));
 
             CreateMap<ProductModel, Product>()
-                .ForMember(dest => dest.createdAt,
-                opt => opt.MapFrom(src => Timestamp.FromDateTime(Convert.ToDateTime(src.CreatedTime))));
+                .ForMember(dest => dest.createdAt,opt => opt.MapFrom(src => src.CreatedTime.ToDateTime()));
+
+            //CreateMap<Models.Product, ProductModel>()
+            //    .ForMember(dest => dest.CreatedTime, opt => opt.MapFrom(src => Timestamp.FromDateTime(src.CreatedTime)));
+
+            //CreateMap<ProductModel, Models.Product>()
+            //    .ForMember(dest => dest.CreatedTime, opt => opt.MapFrom(src => src.CreatedTime.ToDateTime()));
         }
     }
 }

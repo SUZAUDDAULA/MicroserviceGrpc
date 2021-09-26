@@ -3,6 +3,7 @@ using Grpc.Core;
 using Grpc.Net.Client;
 using ProductGrpc.Protos;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ProductGrpcClient
@@ -11,6 +12,10 @@ namespace ProductGrpcClient
     {
         static async Task Main(string[] args)
         {
+            // wait for grpc server is running
+            Console.WriteLine("Waiting for server is running");
+            Thread.Sleep(2000);
+
             using var channel = GrpcChannel.ForAddress("https://localhost:5001");
             var client = new ProductProtoService.ProductProtoServiceClient(channel);
 
@@ -65,7 +70,9 @@ namespace ProductGrpcClient
         private static async Task AddProductAsync(ProductProtoService.ProductProtoServiceClient client)
         {
             Console.WriteLine("AddProductAsync started..");
-            var addProductResponse = await client.AddProductAsync(
+            try
+            {
+                var addProductResponse = await client.AddProductAsync(
                     new AddProductRequest
                     {
                         Product = new ProductModel
@@ -79,7 +86,15 @@ namespace ProductGrpcClient
                         }
                     }
                 );
-            Console.WriteLine("AddProduct Response: " + addProductResponse.ToString());
+                Console.WriteLine("AddProduct Response: " + addProductResponse.ToString());
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+            
+            
         }
 
     }
